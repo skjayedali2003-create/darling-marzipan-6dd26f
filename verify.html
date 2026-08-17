@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Delegate Pass Verification</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f3f6fa;margin:0;padding:24px;color:#172334}
+.card{max-width:520px;margin:30px auto;background:#fff;border-radius:18px;padding:28px;box-shadow:0 8px 30px #0001;text-align:center}
+.logo{width:100px;height:100px;object-fit:contain;border-radius:18px;margin-bottom:10px}
+h1{font-size:24px;margin:8px 0 20px;color:#173b75}.status{padding:14px;border-radius:12px;font-weight:700;margin:16px 0}.ok{background:#e8f8ef;color:#147a45}.bad{background:#fff0f0;color:#b42318}.row{text-align:left;padding:9px 0;border-bottom:1px solid #edf0f4}.row b{display:inline-block;width:120px;color:#697586}.id{font-size:22px;font-weight:800;color:#173b75;margin:15px 0}.small{color:#697586;font-size:13px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="card">
+  <div style="font-size:48px">🎫</div>
+  <h1>Digital Delegate Pass</h1>
+  <div id="status" class="status">Checking verification…</div>
+  <div id="content"></div>
+  <p class="small">Students Front, West Bengal State Committee<br>Delegate Registration 2026 • 27–28 November • Howrah</p>
+</div>
+<script>
+(async()=>{
+ const id=new URLSearchParams(location.search).get('id');
+ const status=document.getElementById('status'), content=document.getElementById('content');
+ if(!id){status.className='status bad';status.textContent='Invalid pass link';return;}
+ try{
+  const r=await fetch('/.netlify/functions/verify-pass?id='+encodeURIComponent(id));
+  const d=await r.json();
+  if(!r.ok||!d.ok){throw new Error(d.error||'Pass not found');}
+  if(d.verified){
+   status.className='status ok';status.textContent='✓ VERIFIED DELEGATE PASS';
+  }else{
+   status.className='status bad';status.textContent='⏳ PAYMENT VERIFICATION PENDING';
+  }
+  content.innerHTML='<div class="id">'+esc(d.delegateId||id)+'</div>'+
+   '<div class="row"><b>Name</b>'+esc(d.name||'—')+'</div>'+
+   '<div class="row"><b>Event</b>'+esc(d.eventDate||'27–28 November 2026')+'</div>'+
+   '<div class="row"><b>Venue</b>'+esc(d.venue||'Howrah')+'</div>';
+ }catch(e){status.className='status bad';status.textContent='Pass could not be verified';content.innerHTML='<p>'+esc(e.message)+'</p>';}
+})();
+function esc(v){return String(v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+</script>
+</body>
+</html>
