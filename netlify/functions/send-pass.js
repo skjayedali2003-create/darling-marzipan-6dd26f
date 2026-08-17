@@ -1,4 +1,4 @@
-const Busboy = require("busboy");
+require("busboy");
 const { getStore } = require("@netlify/blobs");
 
 exports.handler = async (event) => {
@@ -85,15 +85,4 @@ ${registration.screenshotUrl ? "\nPayment Screenshot: "+registration.screenshotU
     if(process.env.WHATSAPP_TOKEN && process.env.WHATSAPP_PHONE_NUMBER_ID && process.env.ADMIN_WHATSAPP){
       const r=await fetch(`https://graph.facebook.com/v23.0/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`,{
         method:"POST",
-        headers:{"Authorization":`Bearer ${process.env.WHATSAPP_TOKEN}`,"Content-Type":"application/json"},
-        body:JSON.stringify({messaging_product:"whatsapp",to:process.env.ADMIN_WHATSAPP,type:"text",text:{body:message}})
-      });
-      delivery.whatsapp=r.ok;
-    }
-
-    return {statusCode:200,headers:{"Content-Type":"application/json"},body:JSON.stringify({ok:true,delivery})};
-  } catch(e) {
-    console.error(e);
-    return {statusCode:500,body:JSON.stringify({ok:false,error:"Server error"})};
-  }
-};
+        headers:{"
